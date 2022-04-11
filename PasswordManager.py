@@ -3,6 +3,7 @@ import os
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 
 
 class PasswordManager:
@@ -11,7 +12,7 @@ class PasswordManager:
         self.password_dir = os.path.expanduser('~') + '/.password_manager'
         self.initialized = os.path.exists(self.password_dir)
 
-    def init_app(self, main_password):
+    def init_app(self):
         if not self.initialized:
             os.makedirs(self.password_dir)
             self.salt = os.urandom(16)
@@ -22,15 +23,25 @@ class PasswordManager:
         else:
             return False
 
-    def generate_key(self, main_password: str):
+    def generate_key(self, main_password: str, method='scrypt'):
         with open(self.password_dir + '/salt', 'rb') as salt_file:
             self.salt = salt_file.read()
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=self.salt,
-            iterations=390000,
-        )
+        if method == 'pbkdf2hmac':
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=self.salt,
+                iterations=390000,
+            )
+        elif method == 'scrypt':
+            kdf = Scrypt(
+                salt=self.salt,
+                length=32,
+                n=2**20,
+                r=8,
+                p=1,
+            )
+
         key = base64.urlsafe_b64encode(kdf.derive(main_password.encode()))
         return key
 
