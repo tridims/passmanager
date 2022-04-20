@@ -19,3 +19,7 @@ Python app that is used to store password. This app currently only support addin
 ## How to use ?
 
 To run this app you can execute file `app.py`. First you need to initialize the folder by running `app.py init`. To list all commands you can execute `app.py --help`.
+
+## How it works ?
+
+For detail about how this program works, you can read the pdf document [here titled Passmanager.pdf](./Passmanager.pdf).
