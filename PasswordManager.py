@@ -49,7 +49,7 @@ class PasswordManager:
         encrypted_password = Fernet(key).encrypt(password.encode())
         return encrypted_password
 
-    def add_password(self, siteName, username, site_password, main_password):
+    def add_password(self, siteName: str, username: str, site_password: str, main_password: str):
         if not self.initialized:
             return False
         try:
@@ -64,9 +64,28 @@ class PasswordManager:
         except:
             return False
 
+    def delete_password(self, siteName, username, main_password):
+        if not self.initialized:
+            raise Exception('Password manager not initialized')
+        try:
+            folder = self.password_dir + '/' + siteName
+            password_file_path = folder + '/' + username + '.pass'
+            key = self.generate_key(main_password)
+            with open(password_file_path, 'rb') as password_file:
+                encrypted_password = password_file.read()
+
+            # try to decrypt the password
+            _ = Fernet(key).decrypt(encrypted_password)
+
+            # if decrypted, delete the file
+            os.remove(password_file_path)
+            return True
+        except:
+            return False
+
     def get_list_password_file_path(self):
         if not self.initialized:
-            return []
+            raise Exception('Password manager not initialized')
         list_password_file_path = []
         for root, dirs, files in os.walk(self.password_dir):
             for file in files:
@@ -74,15 +93,16 @@ class PasswordManager:
                     list_password_file_path.append(os.path.join(root, file))
         return list_password_file_path
 
-    def get_password(self, site, username, main_password):
+    def get_password(self, site: str, username: str, main_password: str):
         password_file_path = self.password_dir + '/' + site + '/' + username + '.pass'
         if not self.initialized:
-            return False
+            raise Exception('Password manager not initialized')
         try:
             key = self.generate_key(main_password)
             with open(password_file_path, 'rb') as password_file:
                 encrypted_password = password_file.read()
             decrypted_password = Fernet(key).decrypt(encrypted_password)
             return decrypted_password.decode()
-        except:
+        except Exception as e:
+            print(e)
             return False

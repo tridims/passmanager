@@ -23,3 +23,7 @@ To run this app you can execute file `app.py`. First you need to initialize the 
 ## How it works ?
 
 For detail about how this program works, you can read the pdf document [here titled Passmanager.pdf](./Passmanager.pdf).
+
+## Python Dependency
+
+You need [typer](https://typer.tiangolo.com/) and cryptography to run this app.

@@ -26,7 +26,16 @@ def add(site: str, username: str, pw: str):
 
 
 @app.command()
-def list_pass():
+def delete(site: str, username: str, main_password: str):
+    r = password_manager.delete_password(site, username, main_password)
+    if not r:
+        typer.echo("Error: Password not deleted")
+    else:
+        typer.echo("Password deleted")
+
+
+@app.command()
+def list_all():
     list_saved_pw = password_manager.get_list_password_file_path()
     if len(list_saved_pw) == 0:
         typer.echo("No password saved")
